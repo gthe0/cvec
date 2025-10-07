@@ -41,20 +41,20 @@ typedef uint32_t uint32;
 typedef uint64_t uint64;
 
 // Internal memory management funcs
-#ifndef _INTERNAL_CVEC_FREE
-#define _INTERNAL_CVEC_FREE free
+#ifndef INTERNAL_CVEC_FREE
+#define INTERNAL_CVEC_FREE free
 #endif
-#ifndef _INTERNAL_CVEC_MALLOC
-#define _INTERNAL_CVEC_MALLOC malloc
+#ifndef INTERNAL_CVEC_MALLOC
+#define INTERNAL_CVEC_MALLOC malloc
 #endif
-#ifndef _INTERNAL_CVEC_CALLOC
-#define _INTERNAL_CVEC_CALLOC calloc
+#ifndef INTERNAL_CVEC_CALLOC
+#define INTERNAL_CVEC_CALLOC calloc
 #endif
-#ifndef _INTERNAL_CVEC_REALLOC
-#define _INTERNAL_CVEC_REALLOC realloc
+#ifndef INTERNAL_CVEC_REALLOC
+#define INTERNAL_CVEC_REALLOC realloc
 #endif
 
-#define _INTERNAL_CVEC_GET_METADATA(vec)\
+#define INTERNAL_CVEC_GET_METADATA(vec)\
     ((_internal_cvec_metadata*)((uint8_t*)(vec) - sizeof(_internal_cvec_metadata)))
 
 
@@ -76,7 +76,7 @@ static inline
 uint64
 cvec_get_capacity(const void* vec)
 {
-    return vec ? (_INTERNAL_CVEC_GET_METADATA(vec)->capacity) : (0);
+    return vec ? (INTERNAL_CVEC_GET_METADATA(vec)->capacity) : (0);
 }
 
 
@@ -86,7 +86,7 @@ static inline
 uint64
 cvec_get_sz(const void* vec)
 {
-    return vec ? (_INTERNAL_CVEC_GET_METADATA(vec)->size) : (0);
+    return vec ? (INTERNAL_CVEC_GET_METADATA(vec)->size) : (0);
 }
 
 
@@ -96,7 +96,7 @@ static inline
 uint64
 cvec_get_type_sz(const void* vec)
 {
-    return vec ? (_INTERNAL_CVEC_GET_METADATA(vec)->typesize) : (0);
+    return vec ? (INTERNAL_CVEC_GET_METADATA(vec)->typesize) : (0);
 }
 
 
@@ -115,7 +115,7 @@ void* cvec_reserve(size_t capacity,
 {
     uint64 new_allocated_size__  = sizeof(_internal_cvec_metadata) + capacity * elem_sz;
 
-    void* vec__ = _INTERNAL_CVEC_MALLOC(new_allocated_size__);
+    void* vec__ = INTERNAL_CVEC_MALLOC(new_allocated_size__);
     memset(vec__, 0, new_allocated_size__);
 
     _internal_cvec_metadata* meta__ = (_internal_cvec_metadata*) vec__;
@@ -143,7 +143,7 @@ void* cvec_push_back(void* vec , const void* elem)
     if(!vec)
         return (NULL);
 
-    _internal_cvec_metadata* meta__ = _INTERNAL_CVEC_GET_METADATA(vec);
+    _internal_cvec_metadata* meta__ = INTERNAL_CVEC_GET_METADATA(vec);
 
     uint64               sz         = meta__->size;
     uint64               capacity   = meta__->capacity;
@@ -154,7 +154,7 @@ void* cvec_push_back(void* vec , const void* elem)
     {
         uint64 new_capacity = (capacity == 0) ? 1 : capacity*2;
         meta__ = (_internal_cvec_metadata*)
-                 _INTERNAL_CVEC_REALLOC(meta__,
+                 INTERNAL_CVEC_REALLOC(meta__,
                                         sizeof(_internal_cvec_metadata) + new_capacity * elem_sz);
 
         // reset the memory to 0 after a point
@@ -177,7 +177,7 @@ void cvec_erase(void* vec, size_t index)
 {    
     if(!vec) return ;
 
-    _internal_cvec_metadata* meta__ = _INTERNAL_CVEC_GET_METADATA(vec);
+    _internal_cvec_metadata* meta__ = INTERNAL_CVEC_GET_METADATA(vec);
 
     uint64               sz         = meta__->size;
     uint64               capacity   = meta__->capacity;
@@ -209,7 +209,7 @@ void cvec_free(void* vec)
 {
     if(!vec) return ;
 
-    _internal_cvec_metadata* meta__ = _INTERNAL_CVEC_GET_METADATA(vec);
+    _internal_cvec_metadata* meta__ = INTERNAL_CVEC_GET_METADATA(vec);
 
     uint64               sz         = meta__->size;
     uint64               elem_sz    = meta__->typesize;
@@ -223,18 +223,18 @@ void cvec_free(void* vec)
             destructor(data + i*elem_sz);
     }
 
-    _INTERNAL_CVEC_FREE(meta__);
+    INTERNAL_CVEC_FREE(meta__);
     return ;
 }
 
 
 // undef internal cvec stuff
-#undef _INTERNAL_CVEC_FREE
-#undef _INTERNAL_CVEC_MALLOC
-#undef _INTERNAL_CVEC_CALLOC
-#undef _INTERNAL_CVEC_REALLOC
+#undef INTERNAL_CVEC_FREE
+#undef INTERNAL_CVEC_MALLOC
+#undef INTERNAL_CVEC_CALLOC
+#undef INTERNAL_CVEC_REALLOC
 
-#undef _INTERNAL_CVEC_GET_METADATA
+#undef INTERNAL_CVEC_GET_METADATA
 
 #endif //CVEC_H_
 
