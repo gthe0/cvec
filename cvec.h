@@ -29,17 +29,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Various primitives to use */
-typedef int8_t   int8;
-typedef int16_t  int16;
-typedef int32_t  int32;
-typedef int64_t  int64;
-
-typedef uint8_t  uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
-
 // Internal memory management funcs
 #ifndef INTERNAL_CVEC_FREE
 #define INTERNAL_CVEC_FREE free
@@ -63,9 +52,9 @@ typedef void (*cvec_elem_destructor)(void* elem);
 
 typedef struct
 {
-    uint64 size;        
-    uint64 capacity;
-    uint64 typesize;
+    uint64_t size;        
+    uint64_t capacity;
+    uint64_t typesize;
 
     cvec_elem_destructor destructor;
 } internal_cvec_metadata_ ;
@@ -73,7 +62,7 @@ typedef struct
 
 // Returns the vector's capacity
 static inline 
-uint64
+uint64_t
 cvec_get_capacity(const void* vec)
 {
     return vec ? (INTERNAL_CVEC_GET_METADATA(vec)->capacity) : (0);
@@ -83,7 +72,7 @@ cvec_get_capacity(const void* vec)
 
 // Returns the vector's size
 static inline 
-uint64
+uint64_t
 cvec_get_sz(const void* vec)
 {
     return vec ? (INTERNAL_CVEC_GET_METADATA(vec)->size) : (0);
@@ -93,7 +82,7 @@ cvec_get_sz(const void* vec)
 
 // Returns the vector's type size
 static inline 
-uint64
+uint64_t
 cvec_get_type_sz(const void* vec)
 {
     return vec ? (INTERNAL_CVEC_GET_METADATA(vec)->typesize) : (0);
@@ -102,7 +91,7 @@ cvec_get_type_sz(const void* vec)
 
 // Returns whether the function is empty or not
 static inline
-int32 cvec_empty(const void* vec)
+int32_t cvec_empty(const void* vec)
 {
     return (cvec_get_sz(vec) == 0);
 }
@@ -113,7 +102,7 @@ void* cvec_reserve(size_t capacity,
                    size_t elem_sz,
                    cvec_elem_destructor destructor)
 {
-    uint64 new_allocated_size__  = sizeof(internal_cvec_metadata_) + capacity * elem_sz;
+    uint64_t new_allocated_size__  = sizeof(internal_cvec_metadata_) + capacity * elem_sz;
 
     void* vec__ = INTERNAL_CVEC_MALLOC(new_allocated_size__);
     memset(vec__, 0, new_allocated_size__);
@@ -124,7 +113,7 @@ void* cvec_reserve(size_t capacity,
     meta__->typesize   = elem_sz;
     meta__->destructor = destructor;
 
-    return ((uint8*)vec__ + sizeof(internal_cvec_metadata_));
+    return ((uint8_t*)vec__ + sizeof(internal_cvec_metadata_));
 }
 
 // Returns a vector with capacity of 1
@@ -145,26 +134,26 @@ void* cvec_push_back(void* vec , const void* elem)
 
     internal_cvec_metadata_* meta__ = INTERNAL_CVEC_GET_METADATA(vec);
 
-    uint64               sz         = meta__->size;
-    uint64               capacity   = meta__->capacity;
-    uint64               elem_sz    = meta__->typesize;
+    uint64_t               sz         = meta__->size;
+    uint64_t               capacity   = meta__->capacity;
+    uint64_t               elem_sz    = meta__->typesize;
     cvec_elem_destructor destructor = meta__->destructor;
 
     if(capacity == sz)
     {
-        uint64 new_capacity = (capacity == 0) ? 1 : capacity*2;
+        uint64_t new_capacity = (capacity == 0) ? 1 : capacity*2;
         meta__ = (internal_cvec_metadata_*)
                  INTERNAL_CVEC_REALLOC(meta__,
                                         sizeof(internal_cvec_metadata_) + new_capacity * elem_sz);
 
         // reset the memory to 0 after a point
         vec = meta__ + 1;
-        memset((uint8*)vec + capacity, 0, (new_capacity - capacity) * elem_sz);
+        memset((uint8_t*)vec + capacity, 0, (new_capacity - capacity) * elem_sz);
 
         meta__->capacity = new_capacity;
     }
 
-    memcpy((uint8*)vec + (sz * elem_sz), elem, elem_sz);
+    memcpy((uint8_t*)vec + (sz * elem_sz), elem, elem_sz);
     meta__->size++;
 
     return vec;
@@ -179,9 +168,9 @@ void cvec_erase(void* vec, size_t index)
 
     internal_cvec_metadata_* meta__ = INTERNAL_CVEC_GET_METADATA(vec);
 
-    uint64               sz         = meta__->size;
-    uint64               capacity   = meta__->capacity;
-    uint64               elem_sz    = meta__->typesize;
+    uint64_t               sz         = meta__->size;
+    uint64_t               capacity   = meta__->capacity;
+    uint64_t               elem_sz    = meta__->typesize;
     cvec_elem_destructor destructor = meta__->destructor;
 
     uint8_t* data = (uint8_t*)vec;
@@ -211,15 +200,15 @@ void cvec_free(void* vec)
 
     internal_cvec_metadata_* meta__ = INTERNAL_CVEC_GET_METADATA(vec);
 
-    uint64               sz         = meta__->size;
-    uint64               elem_sz    = meta__->typesize;
+    uint64_t               sz         = meta__->size;
+    uint64_t               elem_sz    = meta__->typesize;
     cvec_elem_destructor destructor = meta__->destructor;
 
     if(destructor)
     {
-        uint8* data = (uint8*) vec;
+        uint8_t* data = (uint8_t*) vec;
 
-        for(uint64 i = 0; i < sz; i++)
+        for(uint64_t i = 0; i < sz; i++)
             destructor(data + i*elem_sz);
     }
 
